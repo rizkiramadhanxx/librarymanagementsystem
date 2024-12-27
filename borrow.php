@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="mb-3">
       <form action="borrow.php" method="GET">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Search by Book Title" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+          <input type="text" class="form-control" placeholder="Search by Name or Book Title" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
           <button type="submit" class="btn btn-primary">Search</button>
         </div>
       </form>
@@ -208,18 +208,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <td><?php echo htmlspecialchars($borrow['student_name']); ?></td>
               <td><?php echo htmlspecialchars($borrow['book_name']); ?></td>
               <td><?php echo htmlspecialchars($borrow['due_date']); ?></td>
-              <!-- late selisih hari -->
               <td>
-                <?php
-                $today = date('Y-m-d');
-                $due_date = $borrow['due_date'];
-                $diff = abs(strtotime($due_date) - strtotime($today));
-                $days = floor($diff / (60 * 60 * 24));
-                // jika selisih hari kurang dari 0, maka tampilkan 0
-                $hari =   $days < 0 ? 0 : $days;
-                echo $hari;
-                ?>
-                days
+                <!-- /* jika tanggal sekarang lebih besar dari tanggal jatuh tempo, display ketika status borrowed 3 status on going -->
+                <?php if (date('Y-m-d') > $borrow['due_date'] && $borrow['status'] == 'borrowed') : ?>
+                  <span class="badge bg-danger">Late 
+                    <!-- jumlah hari terlambat -->
+                    <?php
+                    $today = new DateTime(date('Y-m-d'));
+                    $dueDate = new DateTime($borrow['due_date']);
+                    $interval = $today->diff($dueDate);
+                    echo $interval->format('%a') . ' days';
+                    ?>
+                  </span>
+                <?php else : ?>
+                  <span class="badge bg-success">no</span>
+                <?php endif; ?>
               </td>
               <td>
                 <?php
