@@ -10,6 +10,13 @@ if (!isset($_SESSION['isLogin']) || !$_SESSION['isLogin']) {
   exit;
 }
 
+// Handle Logout request
+if (isset($_POST['logout'])) {
+  session_destroy();
+  header("Location: login.php");
+  exit;
+}
+
 // Handle delete request
 if (isset($_GET['delete'])) {
   $student_id = intval($_GET['delete']);
@@ -56,12 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_student'])) {
   exit;
 }
 
-// Handle Logout request
-if (isset($_POST['logout'])) {
-  session_destroy();
-  header("Location: login.php");
-  exit;
-}
+
 
 // Fetch all students from the database
 $stmt = $conn->prepare("SELECT * FROM students");
