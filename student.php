@@ -116,6 +116,8 @@ $stmt->close();
         <button type="submit" name="logout" class="btn btn-danger">Logout</button>
       </form>
     </nav>
+    <h2 class="mb-1">Student Management</h2>
+
     <!-- Form Add Student -->
     <form action="student.php" method="POST" class="mb-4">
       <div class="mb-3">

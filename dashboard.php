@@ -12,6 +12,8 @@ if (!isset($_SESSION['isLogin']) || !$_SESSION['isLogin']) {
 
 // Handle delete request
 if (isset($_GET['delete'])) {
+  echo "delete";
+  return;
   $book_id = intval($_GET['delete']);
   $stmt = $conn->prepare("DELETE FROM books WHERE id = ?");
   $stmt->bind_param("i", $book_id);
@@ -20,6 +22,27 @@ if (isset($_GET['delete'])) {
   header("Location: dashboard.php");
   exit;
 }
+
+// Fetch all books from the database
+$stmt = $conn->prepare("SELECT * FROM books");
+$stmt->execute();
+$result = $stmt->get_result();
+$books = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+// handle keyword filter title and category
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+  $keyword = $_GET['search'];
+  $searchTerm = "%$keyword%"; // Create the search term first
+  $stmt = $conn->prepare("SELECT * FROM books WHERE title LIKE ? OR category LIKE ?");
+  $stmt->bind_param("ss", $searchTerm, $searchTerm); // Bind the variables
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $books = $result->fetch_all(MYSQLI_ASSOC);
+  $stmt->close();
+}
+
+
 
 
 // Handle add book request
@@ -126,25 +149,6 @@ if (isset($_POST['logout'])) {
   exit;
 }
 
-// handle keyword filter title and category
-if (isset($_GET['keyword'])) {
-  $keyword = $_GET['keyword'];
-  $searchTerm = "%$keyword%"; // Create the search term first
-  $stmt = $conn->prepare("SELECT * FROM books WHERE title LIKE ? OR category LIKE ?");
-  $stmt->bind_param("ss", $searchTerm, $searchTerm); // Bind the variables
-  $stmt->execute();
-  $result = $stmt->get_result();
-  $books = $result->fetch_all(MYSQLI_ASSOC);
-  $stmt->close();
-}
-
-
-// Fetch all books from the database
-$stmt = $conn->prepare("SELECT * FROM books");
-$stmt->execute();
-$result = $stmt->get_result();
-$books = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
 ?>
 
 
@@ -274,7 +278,7 @@ $stmt->close();
     <form method="GET" class="mb-4">
       <div class="row g-3">
         <div class="col-12">
-          <input type="text" name="keyword" class="form-control" placeholder="keyword" />
+          <input type="text" class="form-control" placeholder="Search by Name or Book Title" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
         </div>
       </div>
       <button type="submit" class="btn btn-primary mt-3">Search</button>
@@ -322,6 +326,12 @@ $stmt->close();
             </td>
           </tr>
         <?php endforeach; ?>
+        <!-- if no books found -->
+        <?php if (empty($books)): ?>
+          <tr>
+            <td colspan="8">No books found.</td>
+          </tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>

@@ -138,7 +138,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body style="background-image: url('uploads/library.jpg');">
   <div class="container mt-5" style="max-width:1000px; background-color: rgba(236, 236, 236, 0.80); margin-bottom: 30px;padding: 30px;">
 
-    <h1 class="mb-4">Borrow Book</h1>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 d-flex justify-content-between">
+      <div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="dashboard.php">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="borrow.php">Borrow</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="student.php">Student</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <?php
+      // logout
+      if (isset($_POST['logout'])) {
+        session_destroy();
+        header("Location: login.php");
+        exit;
+      }
+      ?>
+      <form action="" class="d-flex" method="POST">
+        <button type="submit" name="logout" class="btn btn-danger">Logout</button>
+      </form>
+    </nav>
+    <h2 class="mb-1">Borrow Book</h2>
 
     <!-- Success/Error Messages -->
     <?php if (isset($_SESSION['success'])): ?>
@@ -176,11 +205,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <button type="submit" class="btn btn-primary">Borrow Book</button>
     </form>
-
-    <h2 class="mb-3">Borrowed Books</h2>
-
     <!-- /* Search book -->
-    <div class="mb-3">
+    <div class="mb-3 mt-4">
       <form action="borrow.php" method="GET">
         <div class="input-group">
           <input type="text" class="form-control" placeholder="Search by Name or Book Title" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
@@ -211,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <td>
                 <!-- /* jika tanggal sekarang lebih besar dari tanggal jatuh tempo, display ketika status borrowed 3 status on going -->
                 <?php if (date('Y-m-d') > $borrow['due_date'] && $borrow['status'] == 'borrowed') : ?>
-                  <span class="badge bg-danger">Late 
+                  <span class="badge bg-danger">Late
                     <!-- jumlah hari terlambat -->
                     <?php
                     $today = new DateTime(date('Y-m-d'));
